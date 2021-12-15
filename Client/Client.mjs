@@ -29,15 +29,20 @@ const COLOR = {
   bgWhite: "\x1b[47m",
 };
 
-const colorLog = (color) => (string) =>
+const bgColorLog = (color) => (string) =>
   `${COLOR[color]}${COLOR["fgBlack"]}${string}${COLOR.reset}`;
 
-const red = colorLog("bgRed");
-const blue = colorLog("bgBlue");
-const green = colorLog("bgGreen");
-const yellow = colorLog("bgYellow");
-const magenta = colorLog("bgMagenta");
-const cyan = colorLog("bgCyan");
+const fgColorLog = (color) => (string) =>
+  `${COLOR[color]}${string}${COLOR.reset}`;
+
+const bgRed = bgColorLog("bgRed");
+const fgRed = fgColorLog("fgRed");
+const bgBlue = bgColorLog("bgBlue");
+const bgGreen = bgColorLog("bgGreen");
+const fgGreen = fgColorLog("fgGreen");
+const bgYellow = bgColorLog("bgYellow");
+const bgMagenta = bgColorLog("bgMagenta");
+const bgCyan = bgColorLog("bgCyan");
 
 const log = (message, color = "reset", linebreak = true) => {
   console.log(
@@ -51,7 +56,7 @@ const rl = readline.createInterface({
 });
 
 const [name] = process.argv.slice(2);
-const socket = io("http://localhost:3000", {
+const socket = io("http://localhost:3333", {
   auth: {
     resistanceCodeName: name,
   },
@@ -59,13 +64,16 @@ const socket = io("http://localhost:3000", {
 
 const showHelp = () => {
   log(`
-These are the possible commands in the ${cyan("Bifrost")}:
+These are the possible commands in the ${bgCyan("Bifrost")}:
 =============================================================
 ||                ||                                       ||
-||  heimdal help  || Show possible commands in the ${cyan("Bifrost")} ||
+||  heimdal help  || Show possible commands in the ${bgCyan("Bifrost")} ||
 ||________________||_______________________________________||
 ||                ||                                       ||
 ||  heimdal show  || Show all connections to the bifrost   ||
+||________________||_______________________________________||
+||                ||                                       ||
+||  heimdal close || Close connection to the bifrost       ||
 ||________________||_______________________________________||
   `);
 };
@@ -80,6 +88,10 @@ const heimdalCommand = (reply) => {
       log("function not implemented yet");
       break;
 
+    case "heimdal close":
+      process.exit(1);
+      break;
+
     default:
       break;
   }
@@ -90,17 +102,20 @@ const sendMsg = () => {
   rl.question("> ", (reply) => {
     if (reply.toLowerCase().includes("heimdal")) return heimdalCommand(reply);
     console.log(`Sending message: ${reply}`);
-    socket.emit("chat message", `${name} says ${reply}`);
+    socket.emit("chat message", {
+      sender: name,
+      message: `${fgGreen(`Message from ${name}:`)} ${reply}`,
+    });
     sendMsg();
   });
 };
 
 socket.on("connect", () => {
   console.clear();
-  log(`Successfully connected to the ${cyan("Bifrost")}`);
+  log(`Successfully connected to the ${bgCyan("Bifrost")}`);
 
   log(
-    `Welcome to the bifrost ${name}, I am Heimdal.
+    `Welcome to the ${bgCyan("Bifrost")} ${fgGreen(name)}, I am Heimdal.
 I will deliver your data packages to anyone else 
 connected to the bifrost. You can also call on me for help.
 Just type "heimdal help" like this`,
