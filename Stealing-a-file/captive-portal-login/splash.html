@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Comapny name home page</title>
+    <meta name="description" content="Our first page" />
+  </head>
+  <body>
+    <div id="root" class="container">
+      <div class="top">
+        <h1 id="title" class="hidden"><span id="logo">companyname</span></h1>
+      </div>
+      <div class="login-box animated fadeInUp">
+        <div class="box-header">
+          <h2>Log In</h2>
+        </div>
+        <form onsubmit="submit">
+          <label for="code">Access code</label>
+          <br />
+          <input type="text" id="code" />
+          <br />
+          <button id="submitBtn" type="submit">Sign In</button>
+          <br />
+        </form>
+        <button id="button2" onclick="test()">test</button>
+      </div>
+      <code>
+        <div
+          id="errorContainer"
+          style="height: 200px; width: 500px; overflow: auto"
+        ></div>
+      </code>
+    </div>
+  </body>
+
+  <script>
+    const element = document.querySelector("form");
+    element.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        const rawResponse = await fetch("http://10.0.0.23:8081", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: JSON.stringify({
+            code: event.target[0].value,
+          }),
+        });
+
+        const response = await rawResponse.json();
+        if (rawResponse.ok) {
+          const tempWrapper = document.createElement("div");
+          tempWrapper.innerHTML = response.acceptFormHTML;
+          document.getElementById("root").appendChild(tempWrapper.firstChild);
+          document.getElementById("acceptForm").submit();
+        } else throw response;
+      } catch (error) {
+        document.getElementById("errorContainer").insertAdjacentHTML(
+          "afterbegin",
+          "<p>" +
+            new Date().toLocaleString("sv", {
+              hour: "numeric",
+              minute: "numeric",
+              second: "numeric",
+              fractionalSecondDigits: 3,
+            }) +
+            " " +
+            error.message +
+            "</p>"
+        );
+      }
+    });
+  </script>
+</html>

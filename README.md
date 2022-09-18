@@ -1,2 +1,1 @@
-# escape-room
-A digital escape room with multiple clients and opt in wizard of Oz control
+# This is a repository where I gather parts and ideas for different digital escape rooms
